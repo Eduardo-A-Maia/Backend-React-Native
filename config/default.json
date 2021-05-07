@@ -1,6 +1,9 @@
 {
-     "server": {
+    "server": {
+        "port": 80
+    },
 
-         "port": 80
-     }
+    "db": {
+        "uri": "postgres://dzjwioszcsqoas:97bd82f4a0b4dc7e629ea7056b92c890108a1118a9dc26faea5f4628f43f03b9@ec2-18-215-111-67.compute-1.amazonaws.com:5432/d9saa4dqi4eldppostgres://dzjwioszcsqoas:97bd82f4a0b4dc7e629ea7056b92c890108a1118a9dc26faea5f4628f43f03b9@ec2-18-215-111-67.compute-1.amazonaws.com:5432/d9saa4dqi4eldp"
+    }
 }

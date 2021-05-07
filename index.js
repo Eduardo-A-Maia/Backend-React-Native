@@ -1,58 +1,108 @@
-const pg = require('pg');
-const express = require('express');
-const config = require('config');
-const path = require('path');
-const bodyParser = require('body-parser');  // middleware
-const port = process.env.PORT || config.get('server.port');
+const express = require('express')
+const config = require('config')
+const pg = require('pg')
+const jwt = require('jsonwebtoken');
+const port = process.env.PORT || config.get("server.port")
+const uri = process.env.DATABASE_URL || config.get("db.uri");
+const secret = process.env.JWT_SECRET || config.get("jwt.secret");
 
-const app = express();
+console.log("SECRET==>", secret);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+const app = express()
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
-app.set('port', port);
-
-const pool = new pg.Pool({
-    //                                usuario                                senha                                                     host                  porta    database
-    connectionString: 'postgres://gwcoqfvfrissgn:d5a8eecec6a52162b06e6b9c36394dfb3571c07d4c9c6ae8fb18c6caa6ff7a73@ec2-34-206-8-52.compute-1.amazonaws.com:5432/dkq7s0ilklpdk',
-    ssl: { 
+const listaPedidos = []
+const pool = new pg.Pool ({
+    connectionString: uri,
+    ssl: {
         rejectUnauthorized: false
     }
-});
-
-
-app.route('/reset').get( (req, res) => {
-    let dropCreateTable = "";
-    dropCreateTable += "DROP TABLE IF EXISTS lancamentos; ";
-    dropCreateTable += "CREATE TABLE lancamentos (";
-    dropCreateTable += "data char(12), ";
-    dropCreateTable += "descricao char(50), ";
-    dropCreateTable += "valor decimal(5, 2) ";
-    dropCreateTable += ");";
-
-    pool.query(dropCreateTable, (err, dbres) => { 
-        console.log("Error: ", err);
-        console.log(dbres);
-        res.status(200).send("Banco de dados foi resetado")
-    });
-});
-
-app.route('/extrato').get( (req, res) => {
-    let qry = "SELECT * FROM lancamentos;";
-    pool.query(qry, (err, dbres) => { 
-        console.log("Error: ", err);
-        res.status(200).json(dbres.rows);
-    });
-});
-
-app.route('/lancamento').post( (req, res) => {
-    let qry = "INSERT INTO lancamentos (data, descricao, valor) VALUES ";
-    qry += `('${req.body.data}', '${req.body.descricao}', ${req.body.valor});`;
-    pool.query(qry, (err, dbres) => { 
-        res.status(200).send("Ok");
-    });
-});
-
-app.listen(port, ()=> { 
-    console.log("Servidor iniciado na porta: ", port);
 })
+
+app.route('/reset').get((req, res) => { 
+    let qry = "DROP TABLE IF EXISTS pedidos;"
+    qry += "CREATE TABLE pedidos ("
+    qry += "cliente char(100),"
+    qry += "sabor char(50),"
+    qry += "quantidade int,"
+    qry += "tamanho char(25)"
+    qry += ");"
+    qry += "DROP TABLE IF EXISTS usuarios;"
+    qry += "CREATE TABLE usuarios ("
+    qry += "usuario varchar(50),"
+    qry += "senha varchar(255),"
+    qry += "perfil varchar(25),"
+    qry += "nome varchar(100)"
+    qry += ");"
+    qry += "INSERT INTO usuarios (usuario, senha, perfil, nome) "
+    qry += "VALUES ('admin', '123456', 'ADMIN', 'Antonio Rodrigues');";
+    pool.query(qry, (err, dbres) => {
+        if (err) { 
+            res.status(500).send(err)
+        } else { 
+            res.status(200).send("Banco de dados resetado")
+        }
+    })
+})
+
+app.route('/pedidos').get((req, res) => {
+    console.log("/pedidos acionado")
+    let qry = "SELECT * FROM pedidos;"
+    pool.query(qry, (err, dbres) => { 
+        if(err) { 
+            res.status(500).send(err)
+        } else { 
+            res.status(200).json(dbres.rows)
+        }
+    });
+})
+
+app.route('/pedido/adicionar').post((req, res) => { 
+    console.log("/pedido/adicionar acionado")
+    let qry = "INSERT INTO pedidos (cliente, sabor, quantidade, tamanho) "
+    qry += ` VALUES ('${req.body.cliente}', '${req.body.sabor}', ${req.body.quantidade}, '${req.body.tamanho}');`
+    pool.query(qry, (err, dbres) => { 
+        if (err) { 
+            res.status(500).send(err)
+        } else { 
+            res.status(200).send("Pedido adicionado com sucesso")
+        }
+    });
+})
+
+app.route('/login').post((req, res) => { 
+    console.log("Request ==> ", req.body);
+    let qry = `SELECT * FROM usuarios WHERE usuario = '${req.body.usuario}' `;
+    qry += ` AND senha = '${req.body.senha}';`;
+    console.log("Query==>", qry);
+    pool.query(qry, (err, dbres) => {
+        if (err) { 
+            res.status(500).send(err);
+        } else { 
+            console.log("Foram encontrados ", dbres.rowCount, " registros");
+            console.log(dbres.rows);
+            if (dbres.rowCount > 0) { 
+                const row = dbres.rows[0];
+                console.log("1ª Linha==>", row);
+                const payload = {
+                    usuario: row.usuario,
+                    perfil: row.perfil,
+                    nome: row.nome,
+                }
+                const token = jwt.sign(payload, secret);
+                console.log("Token => ", token);
+                const objToken = {token};
+                res.status(200).json(objToken);
+            } else { 
+                res.status(401).send("Usuário ou senha inválidos");
+            }
+        }
+    })
+});
+
+app.listen(port, () => { 
+    console.log("Iniciando o servidor na porta ", port)
+})
+
+console.log("Inicio do projeto")
