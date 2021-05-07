@@ -14,7 +14,7 @@ app.set('port', port);
 
 const pool = new pg.Pool({
     //                                usuario                                senha                                                     host                  porta    database
-    connectionString: 'postgres://vphuryjqogsxim:0833c41203caacb3c755e6f5b60b73b205fbfa47449778d081a6106e5f6489b6@ec2-18-215-111-67.compute-1.amazonaws.com:5432/d1h0hughtobbr6',
+    connectionString: 'postgres://gwcoqfvfrissgn:d5a8eecec6a52162b06e6b9c36394dfb3571c07d4c9c6ae8fb18c6caa6ff7a73@ec2-34-206-8-52.compute-1.amazonaws.com:5432/dkq7s0ilklpdk',
     ssl: { 
         rejectUnauthorized: false
     }
