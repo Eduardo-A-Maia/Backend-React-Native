@@ -21,12 +21,12 @@ const pool = new pg.Pool ({
 })
 
 app.route('/reset').get((req, res) => { 
-    let qry = "DROP TABLE IF EXISTS pedidos;"
-    qry += "CREATE TABLE pedidos ("
-    qry += "cliente char(100),"
-    qry += "sabor char(50),"
-    qry += "quantidade int,"
-    qry += "tamanho char(25)"
+    let qry = "DROP TABLE IF EXISTS jogos;"
+    qry += "CREATE TABLE jogos ("
+    qry += "nomejogo char(100),"
+    qry += "lancamento char(20),"
+    qry += "genero char(25),"
+    qry += "quantidade int"
     qry += ");"
     qry += "DROP TABLE IF EXISTS usuarios;"
     qry += "CREATE TABLE usuarios ("
@@ -36,7 +36,7 @@ app.route('/reset').get((req, res) => {
     qry += "nome varchar(100)"
     qry += ");"
     qry += "INSERT INTO usuarios (usuario, senha, perfil, nome) "
-    qry += "VALUES ('admin', '123456', 'ADMIN', 'Antonio Rodrigues');";
+    qry += "VALUES ('admin', '123', 'ADMIN', 'Eduardo Vinny');";
     pool.query(qry, (err, dbres) => {
         if (err) { 
             res.status(500).send(err)
@@ -46,9 +46,9 @@ app.route('/reset').get((req, res) => {
     })
 })
 
-app.route('/pedidos').get((req, res) => {
-    console.log("/pedidos acionado")
-    let qry = "SELECT * FROM pedidos;"
+app.route('/jogos').get((req, res) => {
+    console.log("/jogo acionado")
+    let qry = "SELECT * FROM jogos;"
     pool.query(qry, (err, dbres) => { 
         if(err) { 
             res.status(500).send(err)
@@ -58,15 +58,15 @@ app.route('/pedidos').get((req, res) => {
     });
 })
 
-app.route('/pedido/adicionar').post((req, res) => { 
-    console.log("/pedido/adicionar acionado")
-    let qry = "INSERT INTO pedidos (cliente, sabor, quantidade, tamanho) "
-    qry += ` VALUES ('${req.body.cliente}', '${req.body.sabor}', ${req.body.quantidade}, '${req.body.tamanho}');`
+app.route('/jogo/adicionar').post((req, res) => { 
+    console.log("/jogo/adicionar acionado")
+    let qry = "INSERT INTO jogos (nomejogo, lancamento, genero, quantidade) "
+    qry += ` VALUES ('${req.body.nomejogo}', '${req.body.lancamento}', ${req.body.genero}, '${req.body.quantidade}');`
     pool.query(qry, (err, dbres) => { 
         if (err) { 
             res.status(500).send(err)
         } else { 
-            res.status(200).send("Pedido adicionado com sucesso")
+            res.status(200).send("Jogo adicionado com sucesso")
         }
     });
 })
