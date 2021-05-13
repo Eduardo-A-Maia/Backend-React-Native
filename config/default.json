@@ -4,7 +4,7 @@
     },
 
     "db": {
-        "uri": "postgres://dzjwioszcsqoas:97bd82f4a0b4dc7e629ea7056b92c890108a1118a9dc26faea5f4628f43f03b9@ec2-18-215-111-67.compute-1.amazonaws.com:5432/d9saa4dqi4eldp"
+        "uri": "postgres://wtjytyqdzkcbjh:e81438320f66397cb0815499c4004959418fe49000615fae620c4374ff0ef45a@ec2-54-166-167-192.compute-1.amazonaws.com:5432/deviio1j57knoj"
     },
 
     "jwt": {
