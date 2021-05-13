@@ -25,7 +25,7 @@ app.route('/reset').get((req, res) => {
     qry += "CREATE TABLE jogos ("
     qry += "nomejogo char(100),"
     qry += "lancamento char(20),"
-    qry += "genero char(25),"
+    qry += "genero char(25)"
     qry += "quantidade int"
     qry += ");"
     qry += "DROP TABLE IF EXISTS usuarios;"
@@ -47,7 +47,7 @@ app.route('/reset').get((req, res) => {
 })
 
 app.route('/jogos').get((req, res) => {
-    console.log("/jogo acionado")
+    console.log("/jogos acionado")
     let qry = "SELECT * FROM jogos;"
     pool.query(qry, (err, dbres) => { 
         if(err) { 
@@ -58,8 +58,8 @@ app.route('/jogos').get((req, res) => {
     });
 })
 
-app.route('/jogo/adicionar').post((req, res) => { 
-    console.log("/jogo/adicionar acionado")
+app.route('/jogos/adicionar').post((req, res) => { 
+    console.log("/jogos/adicionar acionado")
     let qry = "INSERT INTO jogos (nomejogo, lancamento, genero, quantidade) "
     qry += ` VALUES ('${req.body.nomejogo}', '${req.body.lancamento}', ${req.body.genero}, '${req.body.quantidade}');`
     pool.query(qry, (err, dbres) => { 
